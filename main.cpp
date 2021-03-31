@@ -4,8 +4,14 @@ int WINDOW_WIDTH = 720;
 int WINDOW_HEIGHT = 240;
 SDL_Window* WINDOW;
 
+bool EXIT_STATUS;
+
+std::vector<SDL_Event> FRAME_EVENTS;
+
 void initializeSDL(){
 	WINDOW = SDL_CreateWindow("Ian's Music Thing", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, WINDOW_WIDTH, WINDOW_HEIGHT, 0);
+
+	EXIT_STATUS=false;
 
 	//Initialize SDL Mixer
 	if (SDL_Init(SDL_INIT_AUDIO) < 0) {
@@ -14,7 +20,33 @@ void initializeSDL(){
 	}
 	if (Mix_OpenAudio(44100, AUDIO_S16SYS, 2, 4096) < 0) {
 		printf("Mix_OpenAudio: %s\n", Mix_GetError());
-//		exit(2);
+		exit(2);
+	}
+}
+
+void catchInput(){
+	SDL_Event e;
+	while(SDL_PollEvent(&e)){
+		FRAME_EVENTS.push_back(e);
+	}
+}
+
+void handleInput(){
+	for(int i = 0; i < FRAME_EVENTS.size(); i++){
+		switch(FRAME_EVENTS[i].type){
+			case SDL_QUIT:
+				EXIT_STATUS = true;
+				break;
+		}
+	}
+}
+
+void run(){
+	while(!EXIT_STATUS){
+		//Gather input
+		catchInput();
+		//Handle input
+		handleInput();
 	}
 }
 
@@ -23,13 +55,11 @@ int main(int  argc, char** argv){
 	initializeSDL();
 
 	//Set up music handler
-	std::cerr<<"Loading musicH"<<std::endl;
 	MusicHandler musicH;
-	std::cerr<<"playSong()"<<std::endl;
-	musicH.playSong("Terrible Tim - Brotherman Bill");
+	musicH.playSong("Middle_Earth_Dawn");
 
 	//loop
-	while(Mix_Playing(-1) > 0);
+	run();
 
 	return 0;
 }
