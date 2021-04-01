@@ -56,7 +56,7 @@ int main(int  argc, char** argv){
 
 	//Set up music handler
 	MusicHandler musicH;
-	musicH.playSong("Middle_Earth_Dawn");
+	musicH.playSong("Throne_Room");
 
 	//loop
 	run();
