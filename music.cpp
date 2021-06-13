@@ -1,4 +1,6 @@
-#include "music-selector.h"
+#include "music.h"
+
+MusicHandler MUSIC_HANDLER;
 
 //Rogue Functions
 
@@ -21,7 +23,7 @@ std::vector<std::string> stringToVector(std::string str, char charToSplitAt) {
 
 MusicHandler::MusicHandler(){
   currentSong_ = "";
-  loadSongs();
+  //loadSongs();
 }
 
 MusicHandler::~MusicHandler(){
@@ -61,12 +63,82 @@ void MusicHandler::loadSongs(){
 }
 
 void MusicHandler::playSong(std::string songKey){
+	std::cout<<"Playing " << songKey <<std::endl;
 	Mix_HaltMusic();
 	if(Mix_PlayingMusic() == 0){
-		std::cout<<"Playing " << songKey <<std::endl;
 		Mix_PlayMusic(songs_[songKey], -1);
 		currentSong_ = songKey;
 	}
 }
+
+void MusicHandler::pauseMusic(){
+	Mix_HaltMusic();
+	//Mix_Pause(-1);
+}
+
+std::vector<std::string> MusicHandler::getSongs(){
+	std::vector<std::string> result;
+	for(auto &i : songs_)
+		result.push_back(i.first);
+	return result;
+}
+
+/*	Song Button	*/
+
+SongButton::SongButton(int x, int y, int w, int h, std::string songKey) : Button(x,y,w,h){
+  LOG("Created SongButton");
+  songKey_ = songKey;
+  objectName_ = "SongButton";
+  SDL_Color buttonLabelColor = {255, 255, 255};
+	buttonLabel_ = new Label(x, y, songKey, "Arial24", buttonLabelColor);
+}
+
+SongButton::~SongButton(){
+
+}
+
+void SongButton::render(){
+  SDL_SetRenderDrawColor(WINDOW.getRenderer(), 0, 0, 0, 255);
+  SDL_RenderFillRect(WINDOW.getRenderer(), screenDimensions_);
+  if(buttonLabel_ != nullptr)
+    buttonLabel_->render();
+}
+
+void SongButton::action(){
+  MUSIC_HANDLER.playSong(songKey_);
+  LOG("Pressed SongButton, trying to play " << songKey_);
+}
+
+/*	STOP MUSIC BUTTON	*/
+
+StopMusicButton::StopMusicButton(int x, int y) : Button(x, y, 128, 64){
+  LOG("Created StopMusicButton");
+  objectName_ = "StopMusicButton";
+  SDL_Color buttonLabelColor = {255, 255, 255};
+  buttonLabel_ = new Label(x, y, "PAUSE", "Arial24", buttonLabelColor);
+}
+
+StopMusicButton::~StopMusicButton(){
+	
+}
+
+void StopMusicButton::render(){
+  SDL_SetRenderDrawColor(WINDOW.getRenderer(), 0, 0, 0, 255);
+  SDL_RenderFillRect(WINDOW.getRenderer(), screenDimensions_);
+  if(buttonLabel_ != nullptr)
+    buttonLabel_->render();
+}
+
+void StopMusicButton::action(){
+	LOG("Performing stop music button action");
+	MUSIC_HANDLER.pauseMusic();
+}
+
+
+
+
+
+
+
 
 

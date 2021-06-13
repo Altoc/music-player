@@ -1,0 +1,2 @@
+SDL_AUDIODRIVER="pulse"
+export SDL_AUDIODRIVER
